@@ -3,6 +3,7 @@ PrimalBots Game
 """
 import arcade
 from buildings.cave import Cave
+from units.simple_bot import Simplebot
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -33,6 +34,11 @@ class MyGame(arcade.Window):
         _cave.center_x = 100
         _cave.center_y = 100
         self.scene.add_sprite("Buildings", _cave)
+
+        _simplebot = Simplebot()
+        _simplebot.center_x = 200
+        _simplebot.center_y = 200
+        self.scene.add_sprite("Buildings", _simplebot)
 
     def on_draw(self):
         """Render the screen."""
