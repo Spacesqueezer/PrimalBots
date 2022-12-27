@@ -47,6 +47,9 @@ class MyGame(arcade.Window):
         # Code to draw the screen goes here
         self.scene.draw()
 
+    def on_update(self, delta_time):
+        self.scene.update_animation(delta_time)
+
 
 def main():
     """Main function"""

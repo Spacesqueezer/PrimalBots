@@ -1,5 +1,6 @@
 """Модули"""
 import glob
+import math
 import arcade
 
 
@@ -10,6 +11,7 @@ class Simplebot(arcade.Sprite):
         super().__init__()
         self.scale = scale
         self.images_path = "images/1st_bot/"
+        self.animation_counter = 0
 
         # загрузка анимаций
         self.animations = {
@@ -23,9 +25,15 @@ class Simplebot(arcade.Sprite):
             "moving_downright": [],
         }
 
+        # Загружает файлы анимации по ключам в словаре. Ключ является маской для поиска файла.
         for key, value in self.animations.items():
             _current_animations = glob.glob(self.images_path + f"{key}_" + '[0-9].png')
             for anim in _current_animations:
                 value.append(arcade.load_texture(anim))
 
-        self.texture = self.animations["moving_up"][2]
+    def update_animation(self, delta_time: float = 1 / 60):
+        _current_animation = self.animations["moving_up"]
+        self.animation_counter += 0.1
+        if self.animation_counter >= len(_current_animation):
+            self.animation_counter = 0
+        self.texture = _current_animation[math.floor(self.animation_counter)]
