@@ -49,6 +49,7 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         self.scene.update_animation(delta_time)
+        self.scene.update()
 
 
 def main():

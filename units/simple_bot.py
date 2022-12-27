@@ -24,6 +24,10 @@ class Simplebot(arcade.Sprite):
             "moving_downleft": [],
             "moving_downright": [],
         }
+        self.parameters = {
+            "speed": 5,
+            "position_move_to": (500, 500),
+        }
 
         # Загружает файлы анимации по ключам в словаре. Ключ является маской для поиска файла.
         for key, value in self.animations.items():
@@ -31,9 +35,19 @@ class Simplebot(arcade.Sprite):
             for anim in _current_animations:
                 value.append(arcade.load_texture(anim))
 
+    def move_to_position(self):
+        """Метод движения к указанной точке"""
+        _delta_x = self.center_x - self.parameters["position_move_to"][0]
+        _delta_y = self.center_y - self.parameters["position_move_to"][1]
+        self.velocity = [10, 10]
+        self.change_x = 5
+
     def update_animation(self, delta_time: float = 1 / 60):
         _current_animation = self.animations["moving_up"]
         self.animation_counter += 0.1
         if self.animation_counter >= len(_current_animation):
             self.animation_counter = 0
         self.texture = _current_animation[math.floor(self.animation_counter)]
+
+    def update(self):
+        self.move_to_position()
