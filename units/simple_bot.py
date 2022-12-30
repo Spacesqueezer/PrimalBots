@@ -37,10 +37,11 @@ class Simplebot(arcade.Sprite):
 
     def move_to_position(self):
         """Метод движения к указанной точке"""
+        pass
+
+    def calculate_xy_movement_speed(self):
         _delta_x = self.center_x - self.parameters["position_move_to"][0]
         _delta_y = self.center_y - self.parameters["position_move_to"][1]
-        self.velocity = [10, 10]
-        self.change_x = 5
 
     def update_animation(self, delta_time: float = 1 / 60):
         _current_animation = self.animations["moving_up"]
