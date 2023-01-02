@@ -35,7 +35,7 @@ class MyGame(arcade.Window):
         _cave.center_y = 100
         self.scene.add_sprite("Buildings", _cave)
 
-        for i in range(20):
+        for i in range(200):
             _simplebot = Simplebot()
             _simplebot.center_x = 200
             _simplebot.center_y = 200
