@@ -2,6 +2,7 @@
 import glob
 import math
 import arcade
+import random
 
 
 class Simplebot(arcade.Sprite):
@@ -25,8 +26,9 @@ class Simplebot(arcade.Sprite):
             "moving_downright": [],
         }
         self.parameters = {
-            "speed": 5,
+            "speed": 2,
             "position_move_to": (500, 500),
+            "is_moving": False
         }
 
         # Загружает файлы анимации по ключам в словаре. Ключ является маской для поиска файла.
@@ -37,11 +39,34 @@ class Simplebot(arcade.Sprite):
 
     def move_to_position(self):
         """Метод движения к указанной точке"""
-        pass
+        _delta_x = self.center_x - self.parameters["position_move_to"][0]  # расстояние между юнитом и точкой назначения
+        _delta_y = self.center_y - self.parameters["position_move_to"][1]
+        _speed = self.parameters["speed"]
+
+        if not self.parameters["is_moving"]:
+            self.calculate_xy_movement_speed()
+        else:
+            self.calculate_xy_movement_speed()
+        if abs(_delta_x) >= _speed and abs(_delta_y) >= _speed:
+            self.center_x += self.change_x
+            self.center_y += self.change_y
+        else:
+            self.parameters["is_moving"] = False
+            self.get_new_destination_point()
 
     def calculate_xy_movement_speed(self):
+        """Вычисление скорости по Х и У"""
         _delta_x = self.center_x - self.parameters["position_move_to"][0]
         _delta_y = self.center_y - self.parameters["position_move_to"][1]
+        _distance = math.sqrt(_delta_x ** 2 + _delta_y ** 2)
+        _time = _distance / self.parameters["speed"]
+        self.change_x = -_delta_x / _time
+        self.change_y = -_delta_y / _time
+        self.parameters["is_moving"] = True
+
+    def get_new_destination_point(self):
+        self.parameters["position_move_to"] = (random.randint(0, 1000), random.randint(0, 650))
+
 
     def update_animation(self, delta_time: float = 1 / 60):
         _current_animation = self.animations["moving_up"]
