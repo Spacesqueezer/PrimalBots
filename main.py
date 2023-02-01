@@ -2,9 +2,8 @@
 PrimalBots Game
 """
 import arcade
-from buildings.cave import Cave
-from units.simple_bot import Simplebot
-from buildings.gold_mine import GoldMine
+from buildings import Cave, GoldMine
+from units import Simplebot
 
 # Constants
 SCREEN_WIDTH = 1000
