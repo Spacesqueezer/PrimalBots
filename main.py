@@ -45,6 +45,9 @@ class MyGame(arcade.Window):
         _gold_mine.center_y = 500
         self.scene.add_sprite("Buildings", _gold_mine)
 
+        _simplebot.task_destination = _gold_mine
+        _simplebot.current_task = _simplebot.task_list["collect_resource"]
+
     def on_draw(self):
         """Render the screen."""
 

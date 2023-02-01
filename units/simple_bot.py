@@ -32,11 +32,21 @@ class Simplebot(arcade.Sprite):
             "current_animation": self.animations["moving_up"]
         }
 
+        # список задач, которые умеет юнит.
+        self.task_list = {
+            "collect_resource": self.collect_resource,
+            "move_to_position": self.move_to_position,
+        }
+        self.current_task = self.task_list["move_to_position"]
+
         # Загружает файлы анимации по ключам в словаре. Ключ является маской для поиска файла.
         for key, value in self.animations.items():
             _current_animations = glob.glob(self.images_path + f"{key}_" + '[0-9].png')
             for anim in _current_animations:
                 value.append(arcade.load_texture(anim))
+
+        # Здание, к которому движется бот
+        self.task_destination = None
 
     def move_to_position(self):
         """Метод движения к указанной точке"""
@@ -54,6 +64,14 @@ class Simplebot(arcade.Sprite):
         else:
             self.parameters["is_moving"] = False
             self.get_new_destination_point()
+
+    def collect_resource(self):
+        self.parameters["position_move_to"] = (self.task_destination.center_x, self.task_destination.center_y)
+        self.current_task = self.task_list["move_to_position"]
+        # двигаться до рудника
+        # взять ресурсы
+        # вернуть на базу
+        # повторить
 
     def calculate_xy_movement_speed(self):
         """Вычисление скорости по Х и У"""
@@ -94,4 +112,4 @@ class Simplebot(arcade.Sprite):
         self.texture = _current_animation[math.floor(self.animation_counter)]
 
     def update(self):
-        self.move_to_position()
+        self.current_task()

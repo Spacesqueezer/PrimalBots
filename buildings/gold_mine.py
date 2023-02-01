@@ -7,3 +7,4 @@ class GoldMine(arcade.Sprite):
     def __init__(self, scale=1):
         self.image_file = "images/gold_mine.png"
         super().__init__(self.image_file, scale)
+        self.gold_amount = 100
