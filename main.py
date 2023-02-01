@@ -4,6 +4,7 @@ PrimalBots Game
 import arcade
 from buildings.cave import Cave
 from units.simple_bot import Simplebot
+from buildings.gold_mine import GoldMine
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -35,11 +36,15 @@ class MyGame(arcade.Window):
         _cave.center_y = 100
         self.scene.add_sprite("Buildings", _cave)
 
-        for i in range(200):
-            _simplebot = Simplebot()
-            _simplebot.center_x = 200
-            _simplebot.center_y = 200
-            self.scene.add_sprite("Buildings", _simplebot)
+        _simplebot = Simplebot()
+        _simplebot.center_x = 200
+        _simplebot.center_y = 200
+        self.scene.add_sprite("Buildings", _simplebot)
+
+        _gold_mine = GoldMine(0.1)
+        _gold_mine.center_x = 700
+        _gold_mine.center_y = 500
+        self.scene.add_sprite("Buildings", _gold_mine)
 
     def on_draw(self):
         """Render the screen."""
