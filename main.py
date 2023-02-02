@@ -36,8 +36,8 @@ class MyGame(arcade.Window):
         self.scene.add_sprite("Buildings", _cave)
 
         _simplebot = Simplebot()
-        _simplebot.center_x = 200
-        _simplebot.center_y = 200
+        _simplebot.center_x = 600
+        _simplebot.center_y = 400
         self.scene.add_sprite("Buildings", _simplebot)
 
         _gold_mine = GoldMine(0.1)
@@ -45,7 +45,9 @@ class MyGame(arcade.Window):
         _gold_mine.center_y = 500
         self.scene.add_sprite("Buildings", _gold_mine)
 
+        _simplebot.resource_point = _gold_mine
         _simplebot.task_destination = _gold_mine
+        _simplebot.main_base = _cave
         _simplebot.current_task = _simplebot.task_list["collect_resource"]
 
     def on_draw(self):

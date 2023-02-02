@@ -32,8 +32,17 @@ class Simplebot(arcade.Sprite):
             "current_animation": self.animations["moving_up"]
         }
 
+        # мусорные переменные
+        self.main_base = None
+        self.cargo = None
+        self.resource_point = None
+
         # список задач, которые умеет юнит.
         self.task_list = {
+            "collect_resource": self.collect_resource,
+            "move_to_position": self.move_to_position,
+        }
+        self.subtask_list = {
             "collect_resource": self.collect_resource,
             "move_to_position": self.move_to_position,
         }
@@ -46,7 +55,7 @@ class Simplebot(arcade.Sprite):
                 value.append(arcade.load_texture(anim))
 
         # Здание, к которому движется бот
-        self.task_destination = None
+        self.task_destination = self.resource_point
 
     def move_to_position(self):
         """Метод движения к указанной точке"""
@@ -63,11 +72,24 @@ class Simplebot(arcade.Sprite):
             self.center_y += self.change_y
         else:
             self.parameters["is_moving"] = False
-            self.get_new_destination_point()
+            # self.get_new_destination_point()
 
     def collect_resource(self):
         self.parameters["position_move_to"] = (self.task_destination.center_x, self.task_destination.center_y)
-        self.current_task = self.task_list["move_to_position"]
+
+        # TODO: разобраться с этой хернёй
+        if not self.parameters["is_moving"]:
+            if self.task_destination == self.resource_point:
+                print("Cargo is None")
+                print(self.parameters["is_moving"])
+                self.task_destination = self.main_base
+
+                # self.cargo = 'gold'
+            else:
+                self.cargo = None
+                self.task_destination = self.main_base
+                self.parameters["is_moving"] = True
+
         # двигаться до рудника
         # взять ресурсы
         # вернуть на базу
