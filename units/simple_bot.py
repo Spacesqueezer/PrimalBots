@@ -3,6 +3,7 @@ import glob
 import math
 import random
 import arcade
+import time
 
 
 class Simplebot(arcade.Sprite):
@@ -29,33 +30,37 @@ class Simplebot(arcade.Sprite):
             "speed": 2,
             "position_move_to": (500, 500),
             "is_moving": False,
-            "current_animation": self.animations["moving_up"]
+            "is_gather_resource": False,
+            "current_animation": self.animations["moving_up"],
+            "cargo": None,
+            "resource_source": None,
+            "home_base": None,
+            "gathering_start_time": None,
+            "gathering_end_time": None,
         }
 
-        # мусорные переменные
-        self.main_base = None
-        self.cargo = None
-        self.resource_point = None
-
-        # список задач, которые умеет юнит.
+        # Список задач, которые умеет юнит. Каждая задача может состоять из нескольких подзадач.
         self.task_list = {
             "collect_resource": self.collect_resource,
-            "move_to_position": self.move_to_position,
+            "moving": self.move_to_position,
         }
+
+        # Список подзадач, которые умеют юнит.
         self.subtask_list = {
-            "collect_resource": self.collect_resource,
             "move_to_position": self.move_to_position,
+            "gather_resource": self.gather_resource,
+            "standing": self.stand
         }
-        self.current_task = self.task_list["move_to_position"]
+
+        # Определяем нынешнюю задачу и подзадачу.
+        self.current_task = self.task_list["collect_resource"]
+        self.current_subtask = self.stand
 
         # Загружает файлы анимации по ключам в словаре. Ключ является маской для поиска файла.
         for key, value in self.animations.items():
             _current_animations = glob.glob(self.images_path + f"{key}_" + '[0-9].png')
             for anim in _current_animations:
                 value.append(arcade.load_texture(anim))
-
-        # Здание, к которому движется бот
-        self.task_destination = self.resource_point
 
     def move_to_position(self):
         """Метод движения к указанной точке"""
@@ -64,6 +69,7 @@ class Simplebot(arcade.Sprite):
         _delta_y = self.center_y - self.parameters["position_move_to"][1]
         _speed = self.parameters["speed"]
 
+        # Если юнит стоит на месте, то высчитать его скорость по осям.
         if not self.parameters["is_moving"]:
             self.calculate_xy_movement_speed()
 
@@ -72,28 +78,38 @@ class Simplebot(arcade.Sprite):
             self.center_y += self.change_y
         else:
             self.parameters["is_moving"] = False
-            # self.get_new_destination_point()
 
     def collect_resource(self):
-        self.parameters["position_move_to"] = (self.task_destination.center_x, self.task_destination.center_y)
+        """Сбор ресурсов. Выполняется курсирование между главной базой и источником ресурсов."""
 
-        # TODO: разобраться с этой хернёй
-        if not self.parameters["is_moving"]:
-            if self.task_destination == self.resource_point:
-                print("Cargo is None")
-                print(self.parameters["is_moving"])
-                self.task_destination = self.main_base
+        _sp = self.parameters
 
-                # self.cargo = 'gold'
-            else:
-                self.cargo = None
-                self.task_destination = self.main_base
-                self.parameters["is_moving"] = True
+        # Если нет груза и не определён источник ресурса для сбора,
+        # то назначить из списка источников из главной базы.
+        if not _sp["cargo"] and not _sp["resource_source"]:
+            _sp["resource_source"] = _sp["home_base"].resource_sources["gold"][0]
+            _sp["position_move_to"] = _sp["resource_source"].gather_point
 
-        # двигаться до рудника
-        # взять ресурсы
-        # вернуть на базу
-        # повторить
+        _dist = math.sqrt((_sp["position_move_to"][0] - self.position[0]) ** 2
+                          + (_sp["position_move_to"][1] - self.position[1]) ** 2)
+
+        if not _sp["is_moving"] and not _sp["cargo"] and self.current_subtask == self.subtask_list["standing"]:
+            self.current_subtask = self.subtask_list["move_to_position"]
+
+        # Если юнит не двигается, пустой и не собирает ресурс,
+        # то назначить точкой назначения источник ресурсов.
+        if not _sp["is_moving"] and not _sp["cargo"] and not _sp["is_gather_resource"] and _dist <= 30:
+            _sp["position_move_to"] = _sp["resource_source"].position
+            self.current_subtask = self.subtask_list["gather_resource"]
+
+        if not _sp["is_moving"] and _sp["cargo"] and not _sp["is_gather_resource"] and _dist <= 30:
+            _sp["position_move_to"] = _sp["resource_source"].gather_point
+            _sp["cargo"] = None
+            self.current_subtask = self.subtask_list["move_to_position"]
+
+        if not _sp["is_moving"] and _sp["cargo"] and self.current_subtask == self.subtask_list["gather_resource"]:
+            _sp["position_move_to"] = _sp["home_base"].position
+            self.current_subtask = self.subtask_list["move_to_position"]
 
     def calculate_xy_movement_speed(self):
         """Вычисление скорости по Х и У"""
@@ -133,5 +149,24 @@ class Simplebot(arcade.Sprite):
             self.animation_counter = 0
         self.texture = _current_animation[math.floor(self.animation_counter)]
 
+    def stand(self):
+        pass
+
+    def gather_resource(self):
+        start = time.perf_counter()
+        end = self.parameters["gathering_end_time"]
+        if not self.parameters["is_gather_resource"]:
+            self.parameters["gathering_start_time"] = time.perf_counter()
+            self.parameters["gathering_end_time"] = self.parameters["gathering_start_time"] + 2
+            self.parameters["is_gather_resource"] = True
+            start = self.parameters["gathering_start_time"]
+            end = self.parameters["gathering_end_time"]
+        print(end - start)
+        if end - start <= 0:
+            self.parameters["is_gather_resource"] = False
+            self.parameters["cargo"] = 'gold'
+            print("Готово")
+
     def update(self):
         self.current_task()
+        self.current_subtask()

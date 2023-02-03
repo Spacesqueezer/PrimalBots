@@ -1,6 +1,8 @@
 """
 PrimalBots Game
 """
+import random
+
 import arcade
 from buildings import Cave, GoldMine
 from units import Simplebot
@@ -35,19 +37,21 @@ class MyGame(arcade.Window):
         _cave.center_y = 100
         self.scene.add_sprite("Buildings", _cave)
 
-        _simplebot = Simplebot()
-        _simplebot.center_x = 600
-        _simplebot.center_y = 400
-        self.scene.add_sprite("Buildings", _simplebot)
+        for i in range(10):
+            _simplebot = Simplebot()
+            _simplebot.center_x = random.randrange(SCREEN_WIDTH)
+            _simplebot.center_y = random.randrange(SCREEN_HEIGHT)
+            self.scene.add_sprite("Buildings", _simplebot)
+            _cave.workers.append(_simplebot)
+            _simplebot.parameters["home_base"] = _cave
 
-        _gold_mine = GoldMine(0.1)
-        _gold_mine.center_x = 700
-        _gold_mine.center_y = 500
+
+        _gold_mine = GoldMine(0.1, (700, 500))
         self.scene.add_sprite("Buildings", _gold_mine)
 
-        _simplebot.resource_point = _gold_mine
-        _simplebot.task_destination = _gold_mine
-        _simplebot.main_base = _cave
+        _cave.resource_sources["gold"].append(_gold_mine)
+
+
         _simplebot.current_task = _simplebot.task_list["collect_resource"]
 
     def on_draw(self):
