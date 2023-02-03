@@ -22,6 +22,7 @@ class MyGame(arcade.Window):
         # Call the parent class and set up the window
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
+        self.cave = None
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
 
         self.scene = None
@@ -37,22 +38,29 @@ class MyGame(arcade.Window):
         _cave.center_y = 100
         self.scene.add_sprite("Buildings", _cave)
 
-        for i in range(10):
+        for i in range(1000):
             _simplebot = Simplebot()
+            _simplebot.index = i
             _simplebot.center_x = random.randrange(SCREEN_WIDTH)
             _simplebot.center_y = random.randrange(SCREEN_HEIGHT)
             self.scene.add_sprite("Buildings", _simplebot)
             _cave.workers.append(_simplebot)
             _simplebot.parameters["home_base"] = _cave
 
+        self.cave = _cave
 
         _gold_mine = GoldMine(0.1, (700, 500))
         self.scene.add_sprite("Buildings", _gold_mine)
 
         _cave.resource_sources["gold"].append(_gold_mine)
 
-
         _simplebot.current_task = _simplebot.task_list["collect_resource"]
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            for worker in self.cave.workers:
+                if worker.collides_with_point((x, y)):
+                    print(worker.parameters)
 
     def on_draw(self):
         """Render the screen."""

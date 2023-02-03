@@ -56,6 +56,8 @@ class Simplebot(arcade.Sprite):
         self.current_task = self.task_list["collect_resource"]
         self.current_subtask = self.stand
 
+        self.index = None
+
         # Загружает файлы анимации по ключам в словаре. Ключ является маской для поиска файла.
         for key, value in self.animations.items():
             _current_animations = glob.glob(self.images_path + f"{key}_" + '[0-9].png')
@@ -73,10 +75,11 @@ class Simplebot(arcade.Sprite):
         if not self.parameters["is_moving"]:
             self.calculate_xy_movement_speed()
 
-        if abs(_delta_x) >= _speed and abs(_delta_y) >= _speed:
+        if abs(_delta_x) >= _speed:
             self.center_x += self.change_x
+        if abs(_delta_y) >= _speed:
             self.center_y += self.change_y
-        else:
+        if abs(_delta_x) <= _speed and abs(_delta_y) <= _speed:
             self.parameters["is_moving"] = False
 
     def collect_resource(self):
@@ -161,11 +164,9 @@ class Simplebot(arcade.Sprite):
             self.parameters["is_gather_resource"] = True
             start = self.parameters["gathering_start_time"]
             end = self.parameters["gathering_end_time"]
-        print(end - start)
         if end - start <= 0:
             self.parameters["is_gather_resource"] = False
             self.parameters["cargo"] = 'gold'
-            print("Готово")
 
     def update(self):
         self.current_task()
