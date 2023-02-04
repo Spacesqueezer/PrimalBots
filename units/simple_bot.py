@@ -90,7 +90,7 @@ class Simplebot(arcade.Sprite):
         # Если нет груза и не определён источник ресурса для сбора,
         # то назначить из списка источников из главной базы.
         if not _sp["cargo"] and not _sp["resource_source"]:
-            _sp["resource_source"] = _sp["home_base"].resource_sources["gold"][0]
+            _sp["resource_source"] = random.choice([_sp["home_base"].resource_sources["gold"][0], _sp["home_base"].resource_sources["wood"][0]])
             _sp["position_move_to"] = _sp["resource_source"].gather_point
 
         _dist = math.sqrt((_sp["position_move_to"][0] - self.position[0]) ** 2

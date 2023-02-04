@@ -4,7 +4,7 @@ PrimalBots Game
 import random
 
 import arcade
-from buildings import Cave, GoldMine
+from buildings import Cave, GoldMine, WoodMine
 from units import Simplebot
 
 # Constants
@@ -18,12 +18,14 @@ class MyGame(arcade.Window):
     Main application class.
     """
 
+
     def __init__(self):
         # Call the parent class and set up the window
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
         self.cave = None
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
+        self.background = arcade.load_texture("images/landscape.jpg")
 
         self.scene = None
 
@@ -38,7 +40,7 @@ class MyGame(arcade.Window):
         _cave.center_y = 100
         self.scene.add_sprite("Buildings", _cave)
 
-        for i in range(1000):
+        for i in range(50):
             _simplebot = Simplebot()
             _simplebot.index = i
             _simplebot.center_x = random.randrange(SCREEN_WIDTH)
@@ -49,10 +51,14 @@ class MyGame(arcade.Window):
 
         self.cave = _cave
 
-        _gold_mine = GoldMine(0.1, (700, 500))
+        _gold_mine = GoldMine(0.1, (500, 500))
         self.scene.add_sprite("Buildings", _gold_mine)
 
+        _wood_mine = WoodMine(0.1, (200, 550))
+        self.scene.add_sprite("Buildings", _wood_mine)
+
         _cave.resource_sources["gold"].append(_gold_mine)
+        _cave.resource_sources["wood"].append(_wood_mine)
 
         _simplebot.current_task = _simplebot.task_list["collect_resource"]
 
@@ -64,8 +70,10 @@ class MyGame(arcade.Window):
 
     def on_draw(self):
         """Render the screen."""
+        arcade.start_render()
 
         self.clear()
+        arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
         # Code to draw the screen goes here
         self.scene.draw()
 
