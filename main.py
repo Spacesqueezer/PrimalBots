@@ -5,7 +5,7 @@ import random
 import arcade.gui
 
 import arcade
-from buildings import Cave, GoldMine, WoodMine, BaseMine
+from buildings import Cave, BaseMine
 from units import Simplebot
 from managers import ResManager
 
@@ -68,8 +68,6 @@ class MyGame(arcade.Window):
 
         self.cave = _cave
 
-        # _gold_mine = GoldMine(0.1, (500, 500))
-        # self.scene.add_sprite("Buildings", _gold_mine)
         _gold_mine = BaseMine(0.1, (500, 500), "gold", 100)
         self.scene.add_sprite("Buildings", _gold_mine)
         self.res_manager.mines["gold"].append(_gold_mine)
@@ -78,12 +76,13 @@ class MyGame(arcade.Window):
         self.scene.add_sprite("Buildings", _wood_mine)
         self.res_manager.mines["wood"].append(_wood_mine)
 
-        # _wood_mine = WoodMine(0.1, (200, 550))
-        # self.scene.add_sprite("Buildings", _wood_mine)
-        # self.res_manager.mines["wood"] = _wood_mine
+        _leather_mine = BaseMine(0.1, (400, 200), "leather", 100)
+        self.scene.add_sprite("Buildings", _leather_mine)
+        self.res_manager.mines["leather"].append(_leather_mine)
 
-        # _cave.resource_sources["gold"].append(_gold_mine)
-        # _cave.resource_sources["wood"].append(_wood_mine)
+        _iron_mine = BaseMine(0.1, (600, 300), "iron", 100)
+        self.scene.add_sprite("Buildings", _iron_mine)
+        self.res_manager.mines["iron"].append(_iron_mine)
 
         _simplebot.current_task = _simplebot.task_list["collect_resource"]
 
@@ -105,7 +104,7 @@ class MyGame(arcade.Window):
 
     def on_update(self, delta_time):
         _res = self.res_manager.player_resources
-        self.ui_manager.children[0][0].child.text = f"Голды: {_res['gold']} Бревнов: {_res['wood']} "
+        self.ui_manager.children[0][0].child.text = f"Голды: {_res['gold']} Бревнов: {_res['wood']} Кожи: {_res['leather']} Железа: {_res['iron']}"
         self.scene.update_animation(delta_time)
         self.scene.update()
 
