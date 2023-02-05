@@ -3,12 +3,13 @@ import arcade
 
 
 class BaseMine(arcade.Sprite):
-    """Класс главного здания"""
+    """Класс базового рудника"""
+
     def __init__(
             self,
+            resource_type: str,  # Определяет тип ресурса и внешний вид здания
             scale=1,
             position=(0, 0),
-            resource_type=None,
             resource_amount=100,
     ):
         self.image_file = f'images/mines/{resource_type}_mine.png'
