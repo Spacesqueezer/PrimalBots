@@ -37,6 +37,7 @@ class Simplebot(arcade.Sprite):
             "home_base": None,
             "gathering_start_time": None,
             "gathering_end_time": None,
+            "resource_manager": None,
         }
 
         # Список задач, которые умеет юнит. Каждая задача может состоять из нескольких подзадач.
@@ -90,7 +91,8 @@ class Simplebot(arcade.Sprite):
         # Если нет груза и не определён источник ресурса для сбора,
         # то назначить из списка источников из главной базы.
         if not _sp["cargo"] and not _sp["resource_source"]:
-            _sp["resource_source"] = random.choice([_sp["home_base"].resource_sources["gold"][0], _sp["home_base"].resource_sources["wood"][0]])
+            _res_type = random.choice(list(_sp["resource_manager"].mines.keys()))
+            _sp["resource_source"] = _sp["resource_manager"].mines[_res_type][0]
             _sp["position_move_to"] = _sp["resource_source"].gather_point
 
         _dist = math.sqrt((_sp["position_move_to"][0] - self.position[0]) ** 2
@@ -107,6 +109,7 @@ class Simplebot(arcade.Sprite):
 
         if not _sp["is_moving"] and _sp["cargo"] and not _sp["is_gather_resource"] and _dist <= 30:
             _sp["position_move_to"] = _sp["resource_source"].gather_point
+            self.parameters["resource_manager"].player_resources[_sp["cargo"]] += 1
             _sp["cargo"] = None
             self.current_subtask = self.subtask_list["move_to_position"]
 
@@ -166,7 +169,7 @@ class Simplebot(arcade.Sprite):
             end = self.parameters["gathering_end_time"]
         if end - start <= 0:
             self.parameters["is_gather_resource"] = False
-            self.parameters["cargo"] = 'gold'
+            self.parameters["cargo"] = self.parameters["resource_source"].resource
 
     def update(self):
         self.current_task()

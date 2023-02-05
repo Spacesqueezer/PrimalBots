@@ -2,10 +2,12 @@
 PrimalBots Game
 """
 import random
+import arcade.gui
 
 import arcade
-from buildings import Cave, GoldMine, WoodMine
+from buildings import Cave, GoldMine, WoodMine, BaseMine
 from units import Simplebot
+from managers import ResManager
 
 # Constants
 SCREEN_WIDTH = 1000
@@ -18,11 +20,12 @@ class MyGame(arcade.Window):
     Main application class.
     """
 
-
     def __init__(self):
         # Call the parent class and set up the window
         super().__init__(SCREEN_WIDTH, SCREEN_HEIGHT, SCREEN_TITLE)
 
+        self.res_manager = None
+        self.ui_manager = None
         self.cave = None
         arcade.set_background_color(arcade.csscolor.CORNFLOWER_BLUE)
         self.background = arcade.load_texture("images/landscape.jpg")
@@ -32,8 +35,21 @@ class MyGame(arcade.Window):
     def setup(self):
         """Set up the game here. Call this function to restart the game."""
 
+        # Создание сцены и списков спрайтов.
         self.scene = arcade.Scene()
         self.scene.add_sprite_list("Buildings")
+
+        # Создание менеджера ресурсов
+        self.res_manager = ResManager()
+
+        # Создание графического интерфейса.
+        self.ui_manager = arcade.gui.UIManager()
+        self.ui_manager.enable()
+        self.ui_manager.add(
+            arcade.gui.UIAnchorWidget(
+                anchor_x="center_x",
+                anchor_y="center_y",
+                child=arcade.gui.UITextArea()))
 
         _cave = Cave()
         _cave.center_x = 100
@@ -48,17 +64,26 @@ class MyGame(arcade.Window):
             self.scene.add_sprite("Buildings", _simplebot)
             _cave.workers.append(_simplebot)
             _simplebot.parameters["home_base"] = _cave
+            _simplebot.parameters["resource_manager"] = self.res_manager
 
         self.cave = _cave
 
-        _gold_mine = GoldMine(0.1, (500, 500))
+        # _gold_mine = GoldMine(0.1, (500, 500))
+        # self.scene.add_sprite("Buildings", _gold_mine)
+        _gold_mine = BaseMine(0.1, (500, 500), "gold", 100)
         self.scene.add_sprite("Buildings", _gold_mine)
+        self.res_manager.mines["gold"].append(_gold_mine)
 
-        _wood_mine = WoodMine(0.1, (200, 550))
+        _wood_mine = BaseMine(0.1, (200, 550), "wood", 100)
         self.scene.add_sprite("Buildings", _wood_mine)
+        self.res_manager.mines["wood"].append(_wood_mine)
 
-        _cave.resource_sources["gold"].append(_gold_mine)
-        _cave.resource_sources["wood"].append(_wood_mine)
+        # _wood_mine = WoodMine(0.1, (200, 550))
+        # self.scene.add_sprite("Buildings", _wood_mine)
+        # self.res_manager.mines["wood"] = _wood_mine
+
+        # _cave.resource_sources["gold"].append(_gold_mine)
+        # _cave.resource_sources["wood"].append(_wood_mine)
 
         _simplebot.current_task = _simplebot.task_list["collect_resource"]
 
@@ -76,8 +101,11 @@ class MyGame(arcade.Window):
         arcade.draw_lrwh_rectangle_textured(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, self.background)
         # Code to draw the screen goes here
         self.scene.draw()
+        self.ui_manager.draw()
 
     def on_update(self, delta_time):
+        _res = self.res_manager.player_resources
+        self.ui_manager.children[0][0].child.text = f"Голды: {_res['gold']} Бревнов: {_res['wood']} "
         self.scene.update_animation(delta_time)
         self.scene.update()
 
