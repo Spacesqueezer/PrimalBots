@@ -6,7 +6,7 @@ import arcade.gui
 
 import arcade
 from buildings import Cave, BaseMine
-from units import Simplebot
+from units import Worker
 from managers import ResManager
 from GUI import GUIManager
 
@@ -61,13 +61,14 @@ class MyGame(arcade.Window):
         self.gui_manager = GUIManager()
         self.gui_manager.enable()
         self.gui_manager.create_resources_gui()
+        self.gui_manager.create_control_panel()
 
         cave = Cave()
         cave.center_x = 100
         cave.center_y = 100
         self.scene.add_sprite("Buildings", cave)
         for i in range(50):
-            simplebot = Simplebot()
+            simplebot = Worker()
             simplebot.index = i
             simplebot.center_x = random.randrange(SCREEN_WIDTH)
             simplebot.center_y = random.randrange(SCREEN_HEIGHT)
